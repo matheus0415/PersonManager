@@ -8,6 +8,11 @@ obj/
 
 # VS Code
 .vscode/
+!.vscode/extensions.json
+.idea/
+*.ntvs*
+*.njsproj
+*.sw?
 
 # Sistema operacional
 .DS_Store
@@ -15,16 +20,32 @@ Thumbs.db
 
 # Logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
 # Build
+dist/
+build/
+dist-ssr/
 backend/bin/
 backend/obj/
 
 # Outros
 .env
+.env.*
 secrets.json
+*.local
 node_modules/
 frontend/node_modules/
+
+# Coverage
+coverage/
+
+# Tailwind JIT cache
+.tailwind-cache/
 
 # Publish
 publish/
