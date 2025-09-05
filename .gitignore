@@ -1,0 +1,31 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS Code
+.vscode/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Build
+backend/bin/
+backend/obj/
+
+# Outros
+.env
+secrets.json
+node_modules/
+frontend/node_modules/
+
+# Publish
+publish/
+wwwroot/
