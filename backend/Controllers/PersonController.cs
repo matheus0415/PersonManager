@@ -23,7 +23,7 @@ namespace PersonManage.Controllers
 		[HttpGet]
 		public async Task<ActionResult<IEnumerable<PersonDto>>> GetAll()
 		{
-			var people = await _personService.GetAllAsync();
+			IEnumerable<PersonDto> people = await _personService.GetAllAsync();
 			return Ok(people);
 		}
 
@@ -35,7 +35,7 @@ namespace PersonManage.Controllers
 		[HttpGet("{id}")]
 		public async Task<ActionResult<PersonDto>> GetById(int id)
 		{
-			var person = await _personService.GetByIdAsync(id);
+			PersonDto? person = await _personService.GetByIdAsync(id);
 			if (person == null)
 				return NotFound();
 			return Ok(person);
@@ -49,7 +49,7 @@ namespace PersonManage.Controllers
 		[HttpPost]
 		public async Task<ActionResult<PersonDto>> Create(CreatePersonDto dto)
 		{
-			var created = await _personService.AddAsync(dto);
+			PersonDto created = await _personService.AddAsync(dto);
 			return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
 		}
 
@@ -62,7 +62,7 @@ namespace PersonManage.Controllers
 		[HttpPut("{id}")]
 		public async Task<IActionResult> Update(int id, UpdatePersonDto dto)
 		{
-			var updated = await _personService.UpdateAsync(id, dto);
+			bool updated = await _personService.UpdateAsync(id, dto);
 			if (!updated)
 				return NotFound();
 			return NoContent();
@@ -76,7 +76,7 @@ namespace PersonManage.Controllers
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> Delete(int id)
 		{
-			var deleted = await _personService.DeleteAsync(id);
+			bool deleted = await _personService.DeleteAsync(id);
 			if (!deleted)
 				return NotFound();
 			return NoContent();
