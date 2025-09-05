@@ -1,4 +1,3 @@
-
 # Banco de Teste Rápido (PostgreSQL via Docker)
 
 Execute este comando no terminal:
@@ -8,6 +7,7 @@ docker run --name postgres-personmanager -e POSTGRES_PASSWORD=postgres -e POSTGR
 ```
 
 Conexão:
+
 - Host: localhost
 - Porta: 5432
 - Banco: personmanager
