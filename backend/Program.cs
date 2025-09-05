@@ -10,9 +10,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configure DbContext (use InMemory for demo, change to SqlServer for production)
+// Adiciona comentários XML ao Swagger
+var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+builder.Services.AddSwaggerGen(options =>
+{
+    options.IncludeXmlComments(xmlPath);
+});
+
+// Configure DbContext para usar PostgreSQL
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseInMemoryDatabase("PersonDb"));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Dependency Injection
 builder.Services.AddScoped<IPersonRepository, PersonRepository>();

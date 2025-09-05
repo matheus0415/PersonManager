@@ -13,7 +13,7 @@ namespace PersonManage.Services
 
         public async Task<IEnumerable<PersonDto>> GetAllAsync()
         {
-            var persons = await _repository.GetAllAsync();
+            IEnumerable<Person> persons = await _repository.GetAllAsync();
             return persons.Select(p => new PersonDto
             {
                 Id = p.Id,
@@ -31,7 +31,7 @@ namespace PersonManage.Services
 
         public async Task<PersonDto?> GetByIdAsync(int id)
         {
-            var person = await _repository.GetByIdAsync(id);
+            Person? person = await _repository.GetByIdAsync(id);
             if (person == null) return null;
             return new PersonDto
             {
@@ -66,8 +66,8 @@ namespace PersonManage.Services
             if (!string.IsNullOrWhiteSpace(dto.Email) && !IsValidEmail(dto.Email))
                 throw new ArgumentException("E-mail inválido.");
 
-            var now = DateTime.UtcNow;
-            var person = new Person
+            DateTime now = DateTime.UtcNow;
+            Person person = new Person
             {
                 Name = dto.Name,
                 Gender = dto.Gender,
@@ -79,7 +79,7 @@ namespace PersonManage.Services
                 CreatedAt = now,
                 UpdatedAt = now
             };
-            var created = await _repository.AddAsync(person);
+            Person created = await _repository.AddAsync(person);
             return new PersonDto
             {
                 Id = created.Id,
@@ -97,7 +97,7 @@ namespace PersonManage.Services
 
         public async Task<bool> UpdateAsync(int id, UpdatePersonDto dto)
         {
-            var person = await _repository.GetByIdAsync(id);
+            Person? person = await _repository.GetByIdAsync(id);
             if (person == null) return false;
             if (string.IsNullOrWhiteSpace(dto.Name))
                 throw new ArgumentException("Nome é obrigatório.");
@@ -129,7 +129,7 @@ namespace PersonManage.Services
         {
             try
             {
-                var addr = new System.Net.Mail.MailAddress(email);
+                System.Net.Mail.MailAddress addr = new System.Net.Mail.MailAddress(email);
                 return addr.Address == email;
             }
             catch
@@ -163,13 +163,13 @@ namespace PersonManage.Services
 
         private async Task<bool> CpfExists(string cpf, int? ignoreId = null)
         {
-            var all = await _repository.GetAllAsync();
+            IEnumerable<Person> all = await _repository.GetAllAsync();
             return all.Any(p => p.CPF == cpf && (!ignoreId.HasValue || p.Id != ignoreId.Value));
         }
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var person = await _repository.GetByIdAsync(id);
+            Person? person = await _repository.GetByIdAsync(id);
             if (person == null) return false;
             await _repository.DeleteAsync(person);
             return true;
