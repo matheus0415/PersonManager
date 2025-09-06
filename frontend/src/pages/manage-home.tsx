@@ -1,150 +1,102 @@
-import type React from "react";
-
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { personSchema } from "@/features/person/schema/person-schema";
+import type { PersonForm } from "@/features/person/schema/person-schema";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import {
   Card,
-  CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
+  CardDescription,
+  CardContent,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Table,
-  TableBody,
-  TableCell,
-  TableHead,
   TableHeader,
+  TableBody,
+  TableHead,
   TableRow,
+  TableCell,
 } from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { Pencil, Trash2, Plus, User } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-
-interface Pessoa {
-  id: number;
-  nome: string;
-  email: string;
-  telefone: string;
-  idade: number;
-}
+import { User, Plus, Pencil, Trash2 } from "lucide-react";
 
 export default function ManageHome() {
-  const [pessoas, setPessoas] = useState<Pessoa[]>([
-    {
-      id: 1,
-      nome: "João Silva",
-      email: "joao@email.com",
-      telefone: "(11) 99999-9999",
-      idade: 30,
-    },
-    {
-      id: 2,
-      nome: "Maria Santos",
-      email: "maria@email.com",
-      telefone: "(11) 88888-8888",
-      idade: 25,
-    },
-    {
-      id: 3,
-      nome: "Pedro Costa",
-      email: "pedro@email.com",
-      telefone: "(11) 77777-7777",
-      idade: 35,
-    },
-  ]);
-
+  const [persons, setPersons] = useState<(PersonForm & { id: number })[]>([]);
+  const [editingPerson, setEditingPerson] = useState<
+    (PersonForm & { id: number }) | null
+  >(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingPessoa, setEditingPessoa] = useState<Pessoa | null>(null);
-  const [formData, setFormData] = useState({
-    nome: "",
-    email: "",
-    telefone: "",
-    idade: "",
-  });
-
   const { toast } = useToast();
+  const form = useForm<PersonForm>({
+    resolver: zodResolver(personSchema),
+    defaultValues: {
+      name: "",
+      gender: "",
+      email: "",
+      birthDate: "",
+      placeOfBirth: "",
+      nationality: "",
+      taxId: "",
+    },
+  });
+  const { control, handleSubmit, reset } = form;
 
-  const resetForm = () => {
-    setFormData({ nome: "", email: "", telefone: "", idade: "" });
-    setEditingPessoa(null);
-  };
-
-  const handleOpenDialog = (pessoa?: Pessoa) => {
-    if (pessoa) {
-      setEditingPessoa(pessoa);
-      setFormData({
-        nome: pessoa.nome,
-        email: pessoa.email,
-        telefone: pessoa.telefone,
-        idade: pessoa.idade.toString(),
-      });
+  const handleOpenDialog = (person?: PersonForm & { id: number }) => {
+    if (person) {
+      setEditingPerson(person);
+      reset(person);
     } else {
-      resetForm();
+      setEditingPerson(null);
+      reset();
     }
     setIsDialogOpen(true);
   };
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
-    resetForm();
+    setEditingPerson(null);
+    reset();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (
-      !formData.nome ||
-      !formData.email ||
-      !formData.telefone ||
-      !formData.idade
-    ) {
-      toast(
-        <span style={{ color: "red" }}>Todos os campos são obrigatórios</span>
-      );
-      return;
-    }
-
-    const pessoaData = {
-      nome: formData.nome,
-      email: formData.email,
-      telefone: formData.telefone,
-      idade: Number.parseInt(formData.idade),
-    };
-
-    if (editingPessoa) {
-      // Editar pessoa existente
-      setPessoas((prev) =>
+  const onSubmit = (data: PersonForm) => {
+    if (editingPerson) {
+      setPersons((prev) =>
         prev.map((p) =>
-          p.id === editingPessoa.id
-            ? { ...pessoaData, id: editingPessoa.id }
-            : p
+          p.id === editingPerson.id ? { ...data, id: editingPerson.id } : p
         )
       );
       toast("Pessoa atualizada com sucesso!");
     } else {
-      // Adicionar nova pessoa
-      const newId = Math.max(...pessoas.map((p) => p.id)) + 1;
-      setPessoas((prev) => [...prev, { ...pessoaData, id: newId }]);
+      const newId =
+        persons.length > 0 ? Math.max(...persons.map((p) => p.id)) + 1 : 1;
+      setPersons((prev) => [...prev, { ...data, id: newId }]);
       toast("Pessoa adicionada com sucesso!");
     }
-
     handleCloseDialog();
   };
 
   const handleDelete = (id: number) => {
-    setPessoas((prev) => prev.filter((p) => p.id !== id));
+    setPersons((prev) => prev.filter((p) => p.id !== id));
     toast(<span>Pessoa removida com sucesso!</span>);
   };
 
@@ -161,79 +113,163 @@ export default function ManageHome() {
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
-          <form onSubmit={handleSubmit}>
+          <Form onSubmit={handleSubmit(onSubmit)}>
             <DialogHeader>
               <DialogTitle>
-                {editingPessoa ? "Editar Pessoa" : "Nova Pessoa"}
+                {editingPerson ? "Editar Pessoa" : "Nova Pessoa"}
               </DialogTitle>
               <DialogDescription>
-                {editingPessoa
+                {editingPerson
                   ? "Atualize as informações da pessoa."
                   : "Preencha os dados para cadastrar uma nova pessoa."}
               </DialogDescription>
             </DialogHeader>
 
             <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="nome">Nome</Label>
-                <Input
-                  id="nome"
-                  value={formData.nome}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, nome: e.target.value }))
-                  }
-                  placeholder="Digite o nome completo"
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      email: e.target.value,
-                    }))
-                  }
-                  placeholder="Digite o email"
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="telefone">Telefone</Label>
-                <Input
-                  id="telefone"
-                  value={formData.telefone}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      telefone: e.target.value,
-                    }))
-                  }
-                  placeholder="(11) 99999-9999"
-                />
-              </div>
-
-              <div className="grid gap-2">
-                <Label htmlFor="idade">Idade</Label>
-                <Input
-                  id="idade"
-                  type="number"
-                  value={formData.idade}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      idade: e.target.value,
-                    }))
-                  }
-                  placeholder="Digite a idade"
-                  min="1"
-                  max="120"
-                />
-              </div>
+              <FormField
+                control={control}
+                name="name"
+                render={(props) => (
+                  <FormItem>
+                    <FormLabel htmlFor="name">Nome</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="name"
+                        placeholder="Nome completo"
+                        {...props}
+                        value={
+                          typeof props.value === "string" ? props.value : ""
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage error={props.error} />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="gender"
+                render={(props) => (
+                  <FormItem>
+                    <FormLabel htmlFor="gender">Sexo</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="gender"
+                        placeholder="M/F/Outro"
+                        {...props}
+                        value={
+                          typeof props.value === "string" ? props.value : ""
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage error={props.error} />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="email"
+                render={(props) => (
+                  <FormItem>
+                    <FormLabel htmlFor="email">Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="E-mail"
+                        {...props}
+                        value={
+                          typeof props.value === "string" ? props.value : ""
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage error={props.error} />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="birthDate"
+                render={(props) => (
+                  <FormItem>
+                    <FormLabel htmlFor="birthDate">
+                      Data de Nascimento
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        id="birthDate"
+                        type="date"
+                        placeholder="AAAA-MM-DD"
+                        {...props}
+                        value={
+                          typeof props.value === "string" ? props.value : ""
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage error={props.error} />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="placeOfBirth"
+                render={(props) => (
+                  <FormItem>
+                    <FormLabel htmlFor="placeOfBirth">Naturalidade</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="placeOfBirth"
+                        placeholder="Naturalidade"
+                        {...props}
+                        value={
+                          typeof props.value === "string" ? props.value : ""
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage error={props.error} />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="nationality"
+                render={(props) => (
+                  <FormItem>
+                    <FormLabel htmlFor="nationality">Nacionalidade</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="nationality"
+                        placeholder="Nacionalidade"
+                        {...props}
+                        value={
+                          typeof props.value === "string" ? props.value : ""
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage error={props.error} />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={control}
+                name="taxId"
+                render={(props) => (
+                  <FormItem>
+                    <FormLabel htmlFor="taxId">CPF</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="taxId"
+                        placeholder="000.000.000-00"
+                        {...props}
+                        value={
+                          typeof props.value === "string" ? props.value : ""
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage error={props.error} />
+                  </FormItem>
+                )}
+              />
             </div>
 
             <DialogFooter>
@@ -245,10 +281,10 @@ export default function ManageHome() {
                 Cancelar
               </Button>
               <Button type="submit">
-                {editingPessoa ? "Atualizar" : "Cadastrar"}
+                {editingPerson ? "Atualizar" : "Cadastrar"}
               </Button>
             </DialogFooter>
-          </form>
+          </Form>
         </DialogContent>
       </Dialog>
       <div className="container mx-auto p-6 max-w-6xl">
@@ -272,14 +308,14 @@ export default function ManageHome() {
           <CardHeader>
             <CardTitle>Lista de Pessoas</CardTitle>
             <CardDescription>
-              {pessoas.length}{" "}
-              {pessoas.length === 1
+              {persons.length}{" "}
+              {persons.length === 1
                 ? "pessoa cadastrada"
                 : "pessoas cadastradas"}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {pessoas.length === 0 ? (
+            {persons.length === 0 ? (
               <div className="text-center py-8">
                 <User className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">
@@ -296,28 +332,32 @@ export default function ManageHome() {
                     <TableRow>
                       <TableHead>Nome</TableHead>
                       <TableHead>Email</TableHead>
-                      <TableHead>Telefone</TableHead>
-                      <TableHead>Idade</TableHead>
+                      <TableHead>Sexo</TableHead>
+                      <TableHead>Data de nascimento</TableHead>
+                      <TableHead>Naturalidade</TableHead>
+                      <TableHead>Nacionalidade</TableHead>
+                      <TableHead>CPF</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {pessoas.map((pessoa) => (
-                      <TableRow key={pessoa.id}>
+                    {persons.map((person) => (
+                      <TableRow key={person.id}>
                         <TableCell className="font-medium">
-                          {pessoa.nome}
+                          {person.name}
                         </TableCell>
-                        <TableCell>{pessoa.email}</TableCell>
-                        <TableCell>{pessoa.telefone}</TableCell>
-                        <TableCell>
-                          <Badge variant="secondary">{pessoa.idade} anos</Badge>
-                        </TableCell>
+                        <TableCell>{person.email}</TableCell>
+                        <TableCell>{person.gender}</TableCell>
+                        <TableCell>{person.birthDate}</TableCell>
+                        <TableCell>{person.placeOfBirth}</TableCell>
+                        <TableCell>{person.nationality}</TableCell>
+                        <TableCell>{person.taxId}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleOpenDialog(pessoa)}
+                              onClick={() => handleOpenDialog(person)}
                               className="gap-1"
                             >
                               <Pencil className="h-3 w-3" />
@@ -326,7 +366,7 @@ export default function ManageHome() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleDelete(pessoa.id)}
+                              onClick={() => handleDelete(person.id)}
                               className="gap-1 text-destructive hover:text-destructive"
                             >
                               <Trash2 className="h-3 w-3" />
