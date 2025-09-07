@@ -12,5 +12,6 @@ namespace PersonManage.Models
         public string CPF { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public DateTime? DeletionAt { get; set; }
     }
 }
