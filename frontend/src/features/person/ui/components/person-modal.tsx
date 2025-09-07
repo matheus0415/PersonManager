@@ -34,7 +34,6 @@ interface PersonModalProps {
   onSubmit: (data: PersonForm) => void;
 }
 
-
 export function PersonModal({
   isOpen,
   setIsOpen,
@@ -73,7 +72,7 @@ export function PersonModal({
       <DialogTrigger asChild>
         <Button
           onClick={() => handleOpen()}
-          className="gap-2 fixed top-8 right-8 z-40"
+          className="px-6 py-2 rounded-lg bg-primary text-white font-semibold shadow-lg hover:scale-105 hover:bg-primary/90 transition-all duration-200"
         >
           <Plus className="h-4 w-4" />
           Nova Pessoa
