@@ -50,7 +50,7 @@ export default function ManageHome() {
       taxId: "",
     },
   });
-  const { control, handleSubmit, reset } = form;
+  const { reset } = form;
 
   const handleOpenDialog = (person?: PersonForm & { id: number }) => {
     if (person) {
@@ -95,10 +95,9 @@ export default function ManageHome() {
   return (
     <>
       <PersonModal
+        key={editingPerson ? editingPerson.id : 'new'}
         isOpen={isDialogOpen}
         setIsOpen={setIsDialogOpen}
-        control={control}
-        handleSubmit={handleSubmit}
         onSubmit={onSubmit}
         handleClose={handleCloseDialog}
         handleOpen={handleOpenDialog}

@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Dialog,
   DialogTrigger,
@@ -20,29 +21,53 @@ import { Input } from "@/components/ui/input";
 
 import { Plus } from "lucide-react";
 import type { PersonForm } from "@/features/person/schema/person-schema";
-import type { Control, SubmitHandler, UseFormHandleSubmit } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { personSchema } from "@/features/person/schema/person-schema";
 
 interface PersonModalProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  control: Control<PersonForm>;
-  handleSubmit: UseFormHandleSubmit<PersonForm>;
-  onSubmit: SubmitHandler<PersonForm>;
   handleClose: () => void;
   handleOpen: () => void;
   editingPerson: (PersonForm & { id: number }) | null;
+  onSubmit: (data: PersonForm) => void;
 }
+
 
 export function PersonModal({
   isOpen,
   setIsOpen,
-  control,
-  handleSubmit,
-  onSubmit,
   handleClose,
   handleOpen,
   editingPerson,
+  onSubmit,
 }: PersonModalProps) {
+  const form = useForm<PersonForm>({
+    resolver: zodResolver(personSchema),
+    defaultValues: {
+      name: "",
+      gender: "",
+      email: "",
+      birthDate: "",
+      placeOfBirth: "",
+      nationality: "",
+      taxId: "",
+    },
+    values: editingPerson || undefined,
+  });
+  const { control, handleSubmit, reset } = form;
+
+  React.useEffect(() => {
+    if (isOpen) {
+      if (editingPerson) {
+        reset(editingPerson);
+      } else {
+        reset();
+      }
+    }
+  }, [isOpen, editingPerson, reset]);
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
