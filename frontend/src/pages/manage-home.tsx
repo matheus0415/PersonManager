@@ -1,4 +1,8 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "@/app/globalStore";
+import { createPersonRequest } from "@/features/person/presentation/redux/actions/create-person-actions";
+import { getPersonsRequest } from "@/features/person/presentation/redux/actions/get-persons-actions";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { personSchema } from "@/features/person/schema/person-schema";
@@ -41,7 +45,9 @@ import {
 import { User, Plus, Pencil, Trash2 } from "lucide-react";
 
 export default function ManageHome() {
-  const [persons, setPersons] = useState<(PersonForm & { id: number })[]>([]);
+  const dispatch = useDispatch();
+  const persons = useSelector((state: RootState) => state.getPersons.persons);
+  const loading = useSelector((state: RootState) => state.getPersons.loading);
   const [editingPerson, setEditingPerson] = useState<
     (PersonForm & { id: number }) | null
   >(null);
@@ -79,26 +85,23 @@ export default function ManageHome() {
   };
 
   const onSubmit = (data: PersonForm) => {
-    if (editingPerson) {
-      setPersons((prev) =>
-        prev.map((p) =>
-          p.id === editingPerson.id ? { ...data, id: editingPerson.id } : p
-        )
-      );
-      toast("Pessoa atualizada com sucesso!");
-    } else {
-      const newId =
-        persons.length > 0 ? Math.max(...persons.map((p) => p.id)) + 1 : 1;
-      setPersons((prev) => [...prev, { ...data, id: newId }]);
-      toast("Pessoa adicionada com sucesso!");
-    }
+    // Map taxId to cpf for backend compatibility
+    const { taxId, ...rest } = data;
+    dispatch(createPersonRequest({ ...rest, cpf: taxId }));
+    toast("Pessoa cadastrada! (aguarde confirmação)");
     handleCloseDialog();
+    // Após criar, recarrega a lista
+    setTimeout(() => dispatch(getPersonsRequest()), 500);
   };
 
-  const handleDelete = (id: number) => {
-    setPersons((prev) => prev.filter((p) => p.id !== id));
-    toast(<span>Pessoa removida com sucesso!</span>);
-  };
+  // Carregar pessoas ao montar
+  React.useEffect(() => {
+    dispatch(getPersonsRequest());
+  }, [dispatch]);
+
+  // const handleDelete = () => {
+  //   toast(<span>Pessoa removida com sucesso!</span>);
+  // };
 
   return (
     <>
@@ -306,16 +309,17 @@ export default function ManageHome() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Lista de Pessoas</CardTitle>
+            <CardTitle>Pessoas cadastradas</CardTitle>
             <CardDescription>
-              {persons.length}{" "}
-              {persons.length === 1
-                ? "pessoa cadastrada"
-                : "pessoas cadastradas"}
+              {loading
+                ? "Carregando..."
+                : persons.length === 0
+                ? "Nenhuma pessoa cadastrada"
+                : `${persons.length} pessoa(s) cadastrada(s)`}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {persons.length === 0 ? (
+            {!persons || persons.length === 0 ? (
               <div className="text-center py-8">
                 <User className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">
@@ -351,13 +355,18 @@ export default function ManageHome() {
                         <TableCell>{person.birthDate}</TableCell>
                         <TableCell>{person.placeOfBirth}</TableCell>
                         <TableCell>{person.nationality}</TableCell>
-                        <TableCell>{person.taxId}</TableCell>
+                        <TableCell>{person.cpf}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleOpenDialog(person)}
+                              onClick={() =>
+                                handleOpenDialog({
+                                  ...person,
+                                  taxId: person.cpf,
+                                })
+                              }
                               className="gap-1"
                             >
                               <Pencil className="h-3 w-3" />
@@ -366,7 +375,6 @@ export default function ManageHome() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleDelete(person.id)}
                               className="gap-1 text-destructive hover:text-destructive"
                             >
                               <Trash2 className="h-3 w-3" />
