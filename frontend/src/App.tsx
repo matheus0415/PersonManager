@@ -1,4 +1,4 @@
-import ManageHome from "./pages/manage-home";
+import ManageHome from "./features/person/ui/pages/manage-home";
 import Toaster from "@/components/ui/toaster";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 

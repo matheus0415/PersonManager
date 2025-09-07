@@ -12,30 +12,12 @@ import type { PersonForm } from "@/features/person/schema/person-schema";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from "@/components/ui/form";
-import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableHeader,
@@ -44,7 +26,8 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table";
-import { User, Plus, Pencil, Trash2 } from "lucide-react";
+import { User, Pencil, Trash2 } from "lucide-react";
+import { PersonModal } from "@/features/person/ui/components/person-modal";
 
 export default function ManageHome() {
   const dispatch = useDispatch();
@@ -111,191 +94,16 @@ export default function ManageHome() {
 
   return (
     <>
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogTrigger asChild>
-          <Button
-            onClick={() => handleOpenDialog()}
-            className="gap-2 fixed top-8 right-8 z-40"
-          >
-            <Plus className="h-4 w-4" />
-            Nova Pessoa
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
-          <Form onSubmit={handleSubmit(onSubmit)}>
-            <DialogHeader>
-              <DialogTitle>
-                {editingPerson ? "Editar Pessoa" : "Nova Pessoa"}
-              </DialogTitle>
-              <DialogDescription>
-                {editingPerson
-                  ? "Atualize as informações da pessoa."
-                  : "Preencha os dados para cadastrar uma nova pessoa."}
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="grid gap-4 py-4">
-              <FormField
-                control={control}
-                name="name"
-                render={(props) => (
-                  <FormItem>
-                    <FormLabel htmlFor="name">Nome</FormLabel>
-                    <FormControl>
-                      <Input
-                        id="name"
-                        placeholder="Nome completo"
-                        {...props}
-                        value={
-                          typeof props.value === "string" ? props.value : ""
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage error={props.error} />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="gender"
-                render={(props) => (
-                  <FormItem>
-                    <FormLabel htmlFor="gender">Sexo</FormLabel>
-                    <FormControl>
-                      <Input
-                        id="gender"
-                        placeholder="M/F/Outro"
-                        {...props}
-                        value={
-                          typeof props.value === "string" ? props.value : ""
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage error={props.error} />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="email"
-                render={(props) => (
-                  <FormItem>
-                    <FormLabel htmlFor="email">Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="E-mail"
-                        {...props}
-                        value={
-                          typeof props.value === "string" ? props.value : ""
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage error={props.error} />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="birthDate"
-                render={(props) => (
-                  <FormItem>
-                    <FormLabel htmlFor="birthDate">
-                      Data de Nascimento
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        id="birthDate"
-                        type="date"
-                        placeholder="AAAA-MM-DD"
-                        {...props}
-                        value={
-                          typeof props.value === "string" ? props.value : ""
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage error={props.error} />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="placeOfBirth"
-                render={(props) => (
-                  <FormItem>
-                    <FormLabel htmlFor="placeOfBirth">Naturalidade</FormLabel>
-                    <FormControl>
-                      <Input
-                        id="placeOfBirth"
-                        placeholder="Naturalidade"
-                        {...props}
-                        value={
-                          typeof props.value === "string" ? props.value : ""
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage error={props.error} />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="nationality"
-                render={(props) => (
-                  <FormItem>
-                    <FormLabel htmlFor="nationality">Nacionalidade</FormLabel>
-                    <FormControl>
-                      <Input
-                        id="nationality"
-                        placeholder="Nacionalidade"
-                        {...props}
-                        value={
-                          typeof props.value === "string" ? props.value : ""
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage error={props.error} />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={control}
-                name="taxId"
-                render={(props) => (
-                  <FormItem>
-                    <FormLabel htmlFor="taxId">CPF</FormLabel>
-                    <FormControl>
-                      <Input
-                        id="taxId"
-                        placeholder="000.000.000-00"
-                        {...props}
-                        value={
-                          typeof props.value === "string" ? props.value : ""
-                        }
-                      />
-                    </FormControl>
-                    <FormMessage error={props.error} />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <DialogFooter>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleCloseDialog}
-              >
-                Cancelar
-              </Button>
-              <Button type="submit">
-                {editingPerson ? "Atualizar" : "Cadastrar"}
-              </Button>
-            </DialogFooter>
-          </Form>
-        </DialogContent>
-      </Dialog>
+      <PersonModal
+        isOpen={isDialogOpen}
+        setIsOpen={setIsDialogOpen}
+        control={control}
+        handleSubmit={handleSubmit}
+        onSubmit={onSubmit}
+        handleClose={handleCloseDialog}
+        handleOpen={handleOpenDialog}
+        editingPerson={editingPerson}
+      />
       <div className="container mx-auto p-6 max-w-6xl">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
