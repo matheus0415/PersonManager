@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/globalStore";
 import { createPersonRequest } from "@/features/person/presentation/redux/actions/create-person-actions";
+import { deletePersonRequest } from "@/features/person/presentation/redux/actions/delete-person-actions";
 import { getPersonsRequest } from "@/features/person/presentation/redux/actions/get-persons-actions";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -99,9 +100,11 @@ export default function ManageHome() {
     dispatch(getPersonsRequest());
   }, [dispatch]);
 
-  // const handleDelete = () => {
-  //   toast(<span>Pessoa removida com sucesso!</span>);
-  // };
+  const handleDelete = (id: number) => {
+    dispatch(deletePersonRequest(id));
+    toast("Pessoa removida! (aguarde confirmação)");
+    setTimeout(() => dispatch(getPersonsRequest()), 500);
+  };
 
   return (
     <>
@@ -376,6 +379,7 @@ export default function ManageHome() {
                               variant="outline"
                               size="sm"
                               className="gap-1 text-destructive hover:text-destructive"
+                              onClick={() => handleDelete(person.id)}
                             >
                               <Trash2 className="h-3 w-3" />
                               Excluir
