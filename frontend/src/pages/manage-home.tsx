@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/globalStore";
 import { createPersonRequest } from "@/features/person/presentation/redux/actions/create-person-actions";
+import { updatePersonRequest } from "@/features/person/presentation/redux/actions/update-person-actions";
 import { deletePersonRequest } from "@/features/person/presentation/redux/actions/delete-person-actions";
 import { getPersonsRequest } from "@/features/person/presentation/redux/actions/get-persons-actions";
 import { useForm } from "react-hook-form";
@@ -86,16 +87,18 @@ export default function ManageHome() {
   };
 
   const onSubmit = (data: PersonForm) => {
-    // Map taxId to cpf for backend compatibility
     const { taxId, ...rest } = data;
-    dispatch(createPersonRequest({ ...rest, cpf: taxId }));
-    toast("Pessoa cadastrada! (aguarde confirmação)");
+    if (editingPerson) {
+      dispatch(updatePersonRequest(editingPerson.id, { ...rest, cpf: taxId }));
+      toast("Pessoa atualizada! (aguarde confirmação)");
+    } else {
+      dispatch(createPersonRequest({ ...rest, cpf: taxId }));
+      toast("Pessoa cadastrada! (aguarde confirmação)");
+    }
     handleCloseDialog();
-    // Após criar, recarrega a lista
     setTimeout(() => dispatch(getPersonsRequest()), 500);
   };
 
-  // Carregar pessoas ao montar
   React.useEffect(() => {
     dispatch(getPersonsRequest());
   }, [dispatch]);
