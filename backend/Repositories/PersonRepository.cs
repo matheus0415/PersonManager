@@ -14,7 +14,7 @@ namespace PersonManage.Repositories
 
         public async Task<IEnumerable<Person>> GetAllAsync()
         {
-            return await _context.Person.ToListAsync();
+            return await _context.Person.Where(p => p.DeletionAt == null).ToListAsync();
         }
 
         public async Task<Person?> GetByIdAsync(int id)
@@ -37,7 +37,8 @@ namespace PersonManage.Repositories
 
         public async Task DeleteAsync(Person person)
         {
-            _context.Person.Remove(person);
+            person.DeletionAt = DateTime.UtcNow;
+            _context.Person.Update(person);
             await _context.SaveChangesAsync();
         }
     }
