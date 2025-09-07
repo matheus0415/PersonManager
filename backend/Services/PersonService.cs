@@ -20,12 +20,12 @@ namespace PersonManage.Services
                 Name = p.Name,
                 Gender = p.Gender,
                 Email = p.Email,
-                BirthDate = p.BirthDate,
+                BirthDate = p.BirthDate.Kind == DateTimeKind.Utc ? p.BirthDate : DateTime.SpecifyKind(p.BirthDate.ToUniversalTime(), DateTimeKind.Utc),
                 PlaceOfBirth = p.PlaceOfBirth,
                 Nationality = p.Nationality,
                 CPF = p.CPF,
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt
+                CreatedAt = p.CreatedAt.Kind == DateTimeKind.Utc ? p.CreatedAt : DateTime.SpecifyKind(p.CreatedAt.ToUniversalTime(), DateTimeKind.Utc),
+                UpdatedAt = p.UpdatedAt.Kind == DateTimeKind.Utc ? p.UpdatedAt : DateTime.SpecifyKind(p.UpdatedAt.ToUniversalTime(), DateTimeKind.Utc)
             });
         }
 
@@ -39,12 +39,12 @@ namespace PersonManage.Services
                 Name = person.Name,
                 Gender = person.Gender,
                 Email = person.Email,
-                BirthDate = person.BirthDate,
+                BirthDate = person.BirthDate.Kind == DateTimeKind.Utc ? person.BirthDate : DateTime.SpecifyKind(person.BirthDate.ToUniversalTime(), DateTimeKind.Utc),
                 PlaceOfBirth = person.PlaceOfBirth,
                 Nationality = person.Nationality,
                 CPF = person.CPF,
-                CreatedAt = person.CreatedAt,
-                UpdatedAt = person.UpdatedAt
+                CreatedAt = person.CreatedAt.Kind == DateTimeKind.Utc ? person.CreatedAt : DateTime.SpecifyKind(person.CreatedAt.ToUniversalTime(), DateTimeKind.Utc),
+                UpdatedAt = person.UpdatedAt.Kind == DateTimeKind.Utc ? person.UpdatedAt : DateTime.SpecifyKind(person.UpdatedAt.ToUniversalTime(), DateTimeKind.Utc)
             };
         }
 
@@ -72,12 +72,12 @@ namespace PersonManage.Services
                 Name = dto.Name,
                 Gender = dto.Gender,
                 Email = dto.Email,
-                BirthDate = dto.BirthDate,
+                BirthDate = dto.BirthDate.Kind == DateTimeKind.Utc ? dto.BirthDate : DateTime.SpecifyKind(dto.BirthDate.ToUniversalTime(), DateTimeKind.Utc),
                 PlaceOfBirth = dto.PlaceOfBirth,
                 Nationality = dto.Nationality,
                 CPF = dto.CPF,
-                CreatedAt = now,
-                UpdatedAt = now
+                CreatedAt = now.Kind == DateTimeKind.Utc ? now : DateTime.SpecifyKind(now.ToUniversalTime(), DateTimeKind.Utc),
+                UpdatedAt = now.Kind == DateTimeKind.Utc ? now : DateTime.SpecifyKind(now.ToUniversalTime(), DateTimeKind.Utc)
             };
             Person created = await _repository.AddAsync(person);
             return new PersonDto
@@ -86,12 +86,12 @@ namespace PersonManage.Services
                 Name = created.Name,
                 Gender = created.Gender,
                 Email = created.Email,
-                BirthDate = created.BirthDate,
+                BirthDate = created.BirthDate.Kind == DateTimeKind.Utc ? created.BirthDate : DateTime.SpecifyKind(created.BirthDate.ToUniversalTime(), DateTimeKind.Utc),
                 PlaceOfBirth = created.PlaceOfBirth,
                 Nationality = created.Nationality,
                 CPF = created.CPF,
-                CreatedAt = created.CreatedAt,
-                UpdatedAt = created.UpdatedAt
+                CreatedAt = created.CreatedAt.Kind == DateTimeKind.Utc ? created.CreatedAt : DateTime.SpecifyKind(created.CreatedAt.ToUniversalTime(), DateTimeKind.Utc),
+                UpdatedAt = created.UpdatedAt.Kind == DateTimeKind.Utc ? created.UpdatedAt : DateTime.SpecifyKind(created.UpdatedAt.ToUniversalTime(), DateTimeKind.Utc)
             };
         }
 
@@ -117,11 +117,12 @@ namespace PersonManage.Services
             person.Name = dto.Name;
             person.Gender = dto.Gender;
             person.Email = dto.Email;
-            person.BirthDate = dto.BirthDate;
+            person.BirthDate = dto.BirthDate.Kind == DateTimeKind.Utc ? dto.BirthDate : DateTime.SpecifyKind(dto.BirthDate.ToUniversalTime(), DateTimeKind.Utc);
             person.PlaceOfBirth = dto.PlaceOfBirth;
             person.Nationality = dto.Nationality;
             person.CPF = dto.CPF;
-            person.UpdatedAt = DateTime.UtcNow;
+            var now = DateTime.UtcNow;
+            person.UpdatedAt = now.Kind == DateTimeKind.Utc ? now : DateTime.SpecifyKind(now.ToUniversalTime(), DateTimeKind.Utc);
             await _repository.UpdateAsync(person);
             return true;
         }
