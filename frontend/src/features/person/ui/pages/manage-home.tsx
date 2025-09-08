@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/app/globalStore";
 import { createPersonRequest } from "@/features/person/presentation/redux/actions/create-person-actions";
@@ -26,7 +26,8 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table";
-import { User, Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
+import Logo from "@/../public/logo.svg";
 import { PersonModal } from "@/features/person/ui/components/person-modal";
 import { format } from "date-fns";
 
@@ -34,9 +35,21 @@ export default function ManageHome() {
   const dispatch = useDispatch();
   const persons = useSelector((state: RootState) => state.getPersons.persons);
   const loading = useSelector((state: RootState) => state.getPersons.loading);
+
+  const { error: createPersonError, loading: createPersonLoading } = useSelector(
+    (state: RootState) => state.createPerson
+  );
+  const {error: updatePersonError, loading: updatePersonLoading } = useSelector(
+    (state: RootState) => state.updatePerson
+  );
+  const {error: deletePersonError, loading: deletePersonLoading} = useSelector(
+    (state: RootState) => state.deletePerson
+  );
+  
   const [editingPerson, setEditingPerson] = useState<
     (PersonForm & { id: number }) | null
   >(null);
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
   const form = useForm<PersonForm>({
@@ -74,13 +87,10 @@ export default function ManageHome() {
     const { taxId, ...rest } = data;
     if (editingPerson) {
       dispatch(updatePersonRequest(editingPerson.id, { ...rest, cpf: taxId }));
-      toast("Pessoa atualizada! (aguarde confirmação)");
     } else {
       dispatch(createPersonRequest({ ...rest, cpf: taxId }));
-      toast("Pessoa cadastrada! (aguarde confirmação)");
     }
     handleCloseDialog();
-    setTimeout(() => dispatch(getPersonsRequest()), 500);
   };
 
   React.useEffect(() => {
@@ -89,20 +99,43 @@ export default function ManageHome() {
 
   const handleDelete = (id: number) => {
     dispatch(deletePersonRequest(id));
-    toast("Pessoa removida! (aguarde confirmação)");
-    setTimeout(() => dispatch(getPersonsRequest()), 500);
   };
+
+  useEffect(() => {
+    if (!createPersonLoading && createPersonError) {
+      toast.error("Erro ao cadastrar pessoa: " + createPersonError);
+    } else if (!createPersonLoading && createPersonError === null) {
+      toast.success("Pessoa cadastrada com sucesso!");
+      dispatch(getPersonsRequest());
+    }
+  }, [createPersonLoading, createPersonError, toast, dispatch]);
+
+  useEffect(() => {
+    if (!updatePersonLoading && updatePersonError) {
+      toast.error("Erro ao atualizar pessoa: " + updatePersonError);
+    } else if (!updatePersonLoading && updatePersonError === null) {
+      toast.success("Pessoa atualizada com sucesso!");
+      dispatch(getPersonsRequest());
+    }
+  }, [updatePersonLoading, updatePersonError, toast, dispatch]);
+
+  useEffect(() => {
+    if (!deletePersonLoading && deletePersonError) {
+      toast.error("Erro ao remover pessoa: " + deletePersonError);
+    } else if (!deletePersonLoading && deletePersonError === null) {
+      toast.success("Pessoa removida com sucesso!");
+      dispatch(getPersonsRequest());
+    }
+  }, [deletePersonLoading, deletePersonError, toast, dispatch]);
 
   return (
     <>
       <div className="flex flex-col bg-[#f8fafc] sm:flex-row items-center justify-between p-10 mb-8 gap-4 rounded-2xl shadow-sm border border-[#f1f5f9]">
         <div className="flex items-center gap-4 ">
-          <div className="p-3 bg-[#ffe0db] rounded-xl shadow-md">
-            <User className="h-10 w-10 text-[#ff6b57]" />
-          </div>
+          <img src={Logo} alt="Logo" className="h-24 w-24 object-contain" />
           <div>
             <h1 className="text-4xl font-bold leading-tight text-[#22223b] flex flex-col sm:flex-row sm:items-end gap-0">
-                Gerenciar Pessoas
+              Gerenciar Pessoas
             </h1>
             <p className="text-[#4a4e69] text-base mt-1">
               Visualize, cadastre e gerencie pessoas do sistema
@@ -110,8 +143,6 @@ export default function ManageHome() {
           </div>
         </div>
       </div>
-      {/* <div className="min-h-screen bg-[#f7f7f7] rounded-lg shadow-md py-10 font-sans"> */}
-      {/* <div className="container mx-auto max-w-6xl bg-[#fff4f5] p-4 rounded-lg shadow-md"> */}
       <Card className="mx-auto max-w-6xl shadow border border-[#f1f5f9] bg-white rounded-2xl">
         <CardHeader className="bg-[#f8fafc] rounded-t-2xl flex flex-row items-center justify-between border-b border-[#f1f5f9]">
           <div>
@@ -139,7 +170,7 @@ export default function ManageHome() {
         <CardContent className="pt-6">
           {!persons || persons.length === 0 ? (
             <div className="text-center py-12">
-              <User className="h-14 w-14 text-gray-300 mx-auto mb-4" />
+              <img src={Logo} alt="Logo" className="h-24 w-24 object-contain" />
               <p className="text-gray-500 text-lg">
                 Nenhuma pessoa cadastrada ainda.
               </p>
@@ -223,8 +254,6 @@ export default function ManageHome() {
           )}
         </CardContent>
       </Card>
-      {/* </div> */}
-      {/* </div> */}
     </>
   );
 }
