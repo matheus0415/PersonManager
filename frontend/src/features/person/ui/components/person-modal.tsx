@@ -72,26 +72,27 @@ export function PersonModal({
       <DialogTrigger asChild>
         <Button
           onClick={() => handleOpen()}
-          className="px-6 py-2 rounded-lg bg-primary text-white font-semibold shadow-lg hover:scale-105 hover:bg-primary/90 transition-all duration-200"
+          className="px-6 py-2 rounded-lg bg-[#ff6b57] text-white font-semibold shadow-lg hover:scale-105 hover:bg-[#ff9776] transition-all duration-200"
+          style={{ color: "#fff", backgroundColor: "#ff6b57" }}
         >
           <Plus className="h-4 w-4" />
           Nova Pessoa
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-white rounded-2xl border border-[#f1f5f9] p-0 max-h-[90vh] overflow-y-auto">
         <Form onSubmit={handleSubmit(onSubmit)}>
-          <DialogHeader>
-            <DialogTitle>
+          <DialogHeader className="bg-[#ffe0db] rounded-t-lg px-6 py-4">
+            <DialogTitle className="text-[#ff6b57] text-2xl font-bold">
               {editingPerson ? "Editar Pessoa" : "Nova Pessoa"}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-[#4a4e69]">
               {editingPerson
                 ? "Atualize as informações da pessoa."
                 : "Preencha os dados para cadastrar uma nova pessoa."}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid gap-4 py-4">
+          <div className="grid gap-4 px-6 py-6">
             <FormField
               control={control}
               name="name"
@@ -243,11 +244,20 @@ export function PersonModal({
             />
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleClose}>
+          <DialogFooter className="px-6 pb-6">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleClose}
+              className="rounded-lg border-[#ff6b57] text-[#ff6b57] bg-white hover:bg-[#ffe0db] hover:border-[#ff9776] font-bold shadow-none"
+            >
               Cancelar
             </Button>
-            <Button type="submit">
+            <Button
+              type="submit"
+              className="rounded-lg bg-[#ff6b57] hover:bg-[#ff9776] text-white font-bold shadow-none"
+              style={{ color: "#fff", backgroundColor: "#ff6b57" }}
+            >
               {editingPerson ? "Atualizar" : "Cadastrar"}
             </Button>
           </DialogFooter>
