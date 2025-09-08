@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using PersonManage.Data;
 using PersonManage.Repositories;
 using PersonManage.Services;
+using PersonManage.Extensions;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,6 +49,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.ApplyMigrations();
 }
 
 app.UseHttpsRedirection();
