@@ -4,6 +4,7 @@ import {
   CREATE_PERSON_REQUEST,
   CREATE_PERSON_SUCCESS,
   CREATE_PERSON_ERROR,
+  CREATE_PERSON_RESET,
 } from "../types/create-person-types";
 import type {
   CreatePersonRequestPayload,
@@ -25,10 +26,15 @@ export interface CreatePersonErrorAction {
   payload: string;
 }
 
+export interface CreatePersonResetAction {
+  type: typeof CREATE_PERSON_RESET;
+}
+
 export type CreatePersonActionTypes =
   | CreatePersonRequestAction
   | CreatePersonSuccessAction
-  | CreatePersonErrorAction;
+  | CreatePersonErrorAction
+  | CreatePersonResetAction;
 
 const initialState: CreatePersonState = {
   ...baseInitialState,
@@ -56,6 +62,8 @@ export const createPersonReducer = (
         person: null,
         error: action.payload,
       };
+    case CREATE_PERSON_RESET:
+      return initialState;
     default:
       return state;
   }

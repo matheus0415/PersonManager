@@ -3,6 +3,7 @@ import {
   GET_PERSONS_REQUEST,
   GET_PERSONS_SUCCESS,
   GET_PERSONS_ERROR,
+  GET_PERSONS_RESET,
 } from "../types/get-persons-types";
 
 export interface GetPersonsRequestAction {
@@ -47,6 +48,8 @@ export function getPersonsReducer(
       return { ...state, loading: false, persons: action.payload };
     case GET_PERSONS_ERROR:
       return { ...state, loading: false, error: action.payload };
+    case GET_PERSONS_RESET:
+      return initialState;
     default:
       return state;
   }

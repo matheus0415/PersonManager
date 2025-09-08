@@ -6,12 +6,16 @@ import {
   CREATE_PERSON_REQUEST,
   CREATE_PERSON_SUCCESS,
   CREATE_PERSON_ERROR,
+  CREATE_PERSON_RESET,
 } from "../types/create-person-types";
-
 
 export const createPersonRequest = (payload: CreatePersonRequestPayload) => ({
   type: CREATE_PERSON_REQUEST,
   payload,
+});
+
+export const createPersonReset = () => ({
+  type: CREATE_PERSON_RESET,
 });
 
 export const createPersonSuccess = (payload: CreatePersonSuccessPayload) => ({

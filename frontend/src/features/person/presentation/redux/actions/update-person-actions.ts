@@ -2,6 +2,7 @@ import {
   UPDATE_PERSON_REQUEST,
   UPDATE_PERSON_SUCCESS,
   UPDATE_PERSON_ERROR,
+  UPDATE_PERSON_RESET,
 } from "../types/update-person-types";
 import type {
   CreatePersonParams,
@@ -14,6 +15,10 @@ export const updatePersonRequest = (
 ) => ({
   type: UPDATE_PERSON_REQUEST as typeof UPDATE_PERSON_REQUEST,
   payload: { id, params },
+});
+
+export const updatePersonReset = () => ({
+  type: UPDATE_PERSON_RESET as typeof UPDATE_PERSON_RESET,
 });
 
 export const updatePersonSuccess = (response: CreatePersonResponse) => ({

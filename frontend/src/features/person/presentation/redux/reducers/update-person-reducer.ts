@@ -2,6 +2,7 @@ import {
   UPDATE_PERSON_REQUEST,
   UPDATE_PERSON_SUCCESS,
   UPDATE_PERSON_ERROR,
+  UPDATE_PERSON_RESET,
 } from "../types/update-person-types";
 import type { RequestStatusState } from "@/app/rootState";
 import type {
@@ -24,10 +25,15 @@ export type UpdatePersonErrorAction = {
   payload: string;
 };
 
+export type UpdatePersonResetAction = {
+  type: typeof UPDATE_PERSON_RESET;
+};
+
 export type UpdatePersonActionTypes =
   | UpdatePersonRequestAction
   | UpdatePersonSuccessAction
-  | UpdatePersonErrorAction;
+  | UpdatePersonErrorAction
+  | UpdatePersonResetAction;
 
 export interface UpdatePersonState extends RequestStatusState {
   response?: CreatePersonResponse;
@@ -55,6 +61,8 @@ export const updatePersonReducer = (
       };
     case UPDATE_PERSON_ERROR:
       return { ...state, loading: false, error: action.payload };
+    case UPDATE_PERSON_RESET:
+      return initialState;
     default:
       return state;
   }
